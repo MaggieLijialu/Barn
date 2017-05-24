@@ -3,9 +3,9 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic','controllers','directives','services'])
+angular.module('starter', ['ionic','controllers','directives','services','ngCordova'])
 
-    .run(function($ionicPlatform,$location,$ionicHistory,$ionicPopup,$rootScope,$timeout,$state) {
+    .run(function($ionicPlatform,$location,$ionicHistory,$ionicPopup,$rootScope,$timeout,$state,$cordovaAppVersion,$cordovaBadge,LoginService) {
         $ionicPlatform.ready(function () {
 
             if (window.cordova && window.cordova.plugins.Keyboard) {
@@ -21,38 +21,84 @@ angular.module('starter', ['ionic','controllers','directives','services'])
             if (window.StatusBar) {
                 StatusBar.styleDefault();
             }
+            if (window.cordova && window.cordova.InAppBrowser) {
+              window.open = window.cordova.InAppBrowser.open;
+            }
+            $cordovaAppVersion.getVersionNumber().then(function(version) {
+                localStorage.appVersion=version;
+            });
+            /*document.addEventListener('deviceready', function () {
+                $cordovaBadge.set(3).then(function() {
+                    // 有权限, 已设置.
+                }, function(err) {
+                    // 无权限
+                });
+                $cordovaBadge.get().then(function(badge) {
+                    alert(badge);
+                }, function(err) {
+                    // 无权限
+                });
 
+            }, false);*/
             window.plugins.jPushPlugin.init();
             window.plugins.jPushPlugin.openNotificationInAndroidCallback=function(data){
-                /* var json=data;
-
-                if(typeof data === 'string'){
-                    json=JSON.parse(data);
-                }
-                var id=json.extras['cn.jpush.android.EXTRA'].id;
-                window.alert(id);
-                var alert = json.extras['cn.jpush.android.ALERT'];*/
-
-               /* alert(data.title);
+                /* alert(data.title);
                 var keys="";
                 for(var key in data.extras){
                     keys=keys+"--"+key;
                 }
-
-                alert(data.extras);
-                alert(keys);*/
+               // alert(data.extras);
+               // alert(keys);
                 var detail=data.alert;
                 var alarmId;
+                var deviceId;
+                var address;
+                var alarmType;
+                var time;
                 if(data.extras.alarm_id!=null){
-                    alarmId=parseInt(data.extras.alarm_id);
+                    alarmId=data.extras.alarm_id;
                 }else{
                     alarmId=1;
                 }
-                alert(alarmId+typeof alarmId);
+                if(data.extras.device_id!=null){
+                    deviceId=data.extras.device_id;
+                }else{
+                    deviceId=5;
+                }
+                if(data.extras.address!=null){
+                    address=data.extras.address;
+                }else{
+                    address=5;
+                }
+                if(data.extras.alarm_type!=null){
+                    alarmType=data.extras.alarm_type;
+                }else{
+                    alarmType=5;
+                }
+                if(data.extras.timestamp!=null){
+                    time=data.extras.timestamp;
+                }else{
+                    time="2017-04-28 14:12:25";
+                }
+              //  alert(deviceId+"--"+address+"--"+alarmType+"--"+time);
+                localStorage.warnDeviceId=deviceId;
+                localStorage.warnAddress=address;
+                localStorage.warnAlarmType=alarmType;
+                localStorage.warnTime=time;
+                if(data.extras.alarm_id!=null){
+                    alarmId=parseInt(data.extras.alarm_id);
+                }else {
+                  alarmId = 1;
+                }
                 localStorage.alarmDetail=detail;
                 localStorage.alarmFlag=0;
                 localStorage.alarmId=alarmId;
-                $state.go("tabs.confirmwarn",{detail:detail,flag:0,alarmId:alarmId});
+                localStorage.receiveType=1;
+                $state.go("tabs.confirmwarn",{detail:detail,alarmId:alarmId,type:1});*/
+
+                $state.go("tabs.warn",{},{reload:true});
+
+
             };
             window.plugins.jPushPlugin.setDebugMode(true);
 
@@ -104,7 +150,8 @@ angular.module('starter', ['ionic','controllers','directives','services'])
                 if ($location.path() == '/tab/home'
                     || $location.path() == '/tab/table'
                     || $location.path() == '/tab/risk'
-                    || $location.path() == '/tab/person') {
+                    || $location.path() == '/tab/person'
+                    || $location.path() == '/login') {
 
                     showConfirm();
 
@@ -112,8 +159,8 @@ angular.module('starter', ['ionic','controllers','directives','services'])
 
                     if (cordova.plugins.Keyboard.isVisible) {
                         cordova.plugins.Keyboard.close();
-                    }else if($ionicHistory.currentView().stateName == "tabs.confirmwarn"){
-                        if ($ionicHistory.backView().stateName!="tabs.warn"){
+                    }else if($ionicHistory.currentView().stateName == "tabs.warn"){
+                        if ($ionicHistory.backView().stateName!="tabs.risk"){
                             $state.go("tabs.risk");
                         }else {
                             $ionicHistory.goBack();
@@ -155,7 +202,8 @@ angular.module('starter', ['ionic','controllers','directives','services'])
             .state('tabs', {
                 url: "/tab",
                 abstract: true,
-                templateUrl: "templates/tabs.html"
+                templateUrl: "templates/tabs.html",
+                controller: "TabsCtrl"
             })
 
             .state('tabs.home', {
@@ -213,7 +261,7 @@ angular.module('starter', ['ionic','controllers','directives','services'])
                 }
             })
             .state('tabs.confirmwarn', {
-                url: "/confirmwarn/:detail:flag:alarmId",
+                url: "/confirmwarn/:detail:alarmId:type",
                 views: {
                     'risk-tab': {
                         templateUrl: "templates/risk-warn-confirm.html",
@@ -256,12 +304,22 @@ angular.module('starter', ['ionic','controllers','directives','services'])
                     }
                 }
             })
-        // if(localStorage.getItem("start")==2){
-        //     $urlRouterProvider.otherwise("/login");
-        // }else{
-        //     localStorage.setItem("start",2);
-        //     $urlRouterProvider.otherwise("/start");
-        // }
+            .state('tabs.update', {
+              url: "/update",
+              views: {
+                'person-tab': {
+                  templateUrl: "templates/person-update.html",
+                  controller: "UpdateCtrl"
+                }
+              }
+            })
 
-        $urlRouterProvider.otherwise("/login");
+        if(localStorage.getItem("start")==2){
+            $urlRouterProvider.otherwise("/login");
+        }else{
+            localStorage.setItem("start",2);
+            $urlRouterProvider.otherwise("/start");
+        }
+
+
     })

@@ -1,4 +1,4 @@
-<ion-view hide-back-button="true" >
+<ion-view>
     <ion-nav-title>统计信息</ion-nav-title>
     <ion-content style="background:#F1F1F1">
 
@@ -8,10 +8,9 @@
             height:150px;
             position:fixed;
             padding:10px;
-            top:20px;"
-            ng-controller="doMessage">
+            top:20px;">
             <!-- 添加canvas标签，并加上红色边框以便于在页面上查看 -->
-            <canvas id="myCanvas" width="120px" height="120px" value= 0.8></canvas>
+            <canvas id="myCanvas" width="120px" height="120px"></canvas>
             <div style="
                         width:50%;
                         height:30%;
@@ -23,20 +22,20 @@
                 <p style="color:gray; position:relative;top:0px;margin:0px;">Warning Messages</p>
             </div>
             <div style="width:150px;height:30px;position:absolute;right:10px;bottom:40px">
-         
+
                 <table width="100%" border="0px">
                     <tr>
                         <td style="width:50px;vertical-align:top;">
                             <p style="font-size:10px;margin:0px;"><img src="./img/statistic/lightPink.png"width="10" height="11" >已解决的消息</p>
                             <p style="font-size:10px;margin:0px;"><img src="./img/statistic/darkPink.png" width="10" height="11.5">未解决的消息</p>
                         </td>
-                        <td style="width:20px;vertical-align:top;text-align:right" ng-controller="doMessage">
+                        <td style="width:20px;vertical-align:top;text-align:right">
                             {{message.already}}<br>{{message.notyet}}</td>
                     </tr>
                 </table>
             </div>
         </div>
-        
+
 <!--第二个部分-->
 
         <div style="background:white;

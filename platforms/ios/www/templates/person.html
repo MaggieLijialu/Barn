@@ -1,4 +1,4 @@
-<ion-view hide-back-button="true">
+<ion-view hide-back-button="true" cache-view="false">
     <ion-nav-title>个人中心</ion-nav-title>
     <ion-content>
         <div class="person-nav">
@@ -20,7 +20,7 @@
                         icon-right="img/icon-grey-arrow-right.png">
                 </table-list-item>
             </a>
-            <a class="item" href="">
+            <a class="item" href="#/tab/update">
                 <table-list-item
                         icon-left="img/person-icon-update.png"
                         item-text="检查更新"
@@ -33,7 +33,7 @@
                         item-text="关于"
                         icon-right="img/icon-grey-arrow-right.png"
                         text-show="true"
-                        extra-text="当前1.0">
+                        extra-text={{version}}>
                 </table-list-item>
             </a>
         </div>

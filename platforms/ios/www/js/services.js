@@ -16,6 +16,20 @@ angular.module('services', [])
 
         }
     }])
+    .factory('UserService',[function(){
+      var userName,userSex,userAge,userAddress,userRole,userPhone;
+
+      return{
+        person:{
+          userName:userName,
+          userSex:userSex,
+          userAge:userAge,
+          userAddress:userAddress,
+          userRole:userRole,
+          userPhone:userPhone
+        }
+      }
+    }])
     .factory('LoadingService',['$ionicLoading',function($ionicLoading){
 
         var show = function() {
@@ -58,8 +72,28 @@ angular.module('services', [])
             myContent=content;
             myBody="<p style='color: #108678;width: 80%;margin: auto;text-align: center'>"+myContent+"</p>";
         };
+      // 自定义弹窗
+      var showPopup=function (myTap) {
+        var myPopup = $ionicPopup.show({
+          title: myTitle,
+          template: myBody,
+
+          buttons: [
+            {
+              text: '<b>确认</b>',
+              type: 'button-royal',
+              onTap: function(e) {
+                myTap();
+              }
+            }
+          ]
+        });
+      };
+
+
         return{
             showAlert:showAlert,
+            showPopup:showPopup,
             setTitle:setTitle,
             setContent:setContent
         };
